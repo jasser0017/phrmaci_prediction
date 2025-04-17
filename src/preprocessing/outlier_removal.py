@@ -1,14 +1,11 @@
 # src/preprocessing/outlier_removal.py
 
 import pandas as pd
-from preprocessing.outlier_detection import (
-    outliers_iqr as apply_iqr,
-    outliers_winsorize as apply_winsorize,
-    outliers_3sigma as apply_3sigma
-)
+
 
 
 def apply_best_methods(df, results_summary, columns, group_col='Code prdt'):
+    from outlier_detection import outliers_iqr, outliers_winsorize, outliers_3sigma
     cleaned_dfs = []
 
     for prdt, group in df.groupby(group_col):
@@ -29,13 +26,13 @@ def apply_best_methods(df, results_summary, columns, group_col='Code prdt'):
                 continue
 
             if method == "IQR":
-                cleaned_col, *_ = apply_iqr(original, k=2.0)
+                cleaned_col, *_ = outliers_iqr(original, k=2.0)
             elif method == "Winsorize":
-                cleaned_col = apply_winsorize(original, limits=(0.05, 0.05))
+                cleaned_col = outliers_winsorize(original, limits=(0.05, 0.05))
                 group.loc[cleaned_col.index, col] = cleaned_col
                 continue  
             elif method == "3sigma":
-                cleaned_col, *_ = apply_3sigma(original)
+                cleaned_col, *_ = outliers_3sigma(original)
             else:
                 continue
 

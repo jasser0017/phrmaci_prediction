@@ -1,85 +1,52 @@
+# src/preprocessing/preprocessing.py
 
-"""
-Module : preprocessing
+from data_loader import load_data
+from negative_cleaning import handle_negative_values
+from filtering import filter_products_advanced
 
-Objet  : Prétraitement des données : nettoyage, typage, gestion des outliers et des valeurs manquantes
-"""
+from imputation import (
+    evaluate_imputation_methods_for_product,
+    apply_global_imputations
+)
+from outlier_detection import find_best_methods_for_df
+from outlier_removal import apply_best_methods
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import missingno as msno
 import os
-from sklearn.impute import SimpleImputer, KNNImputer
-from sklearn.metrics import mean_squared_error
 import pandas as pd
-import numpy as np
-
-
-
-
-
-
-
-def show_missing_values(df, output_path="outputs/visualisations/missing_values.png"):
-    msno.matrix(df)
-    plt.tight_layout()
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    plt.savefig(output_path)
-    print(f"✅ Visualisation des valeurs manquantes sauvegardée sous : {output_path}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 def main():
-    path = "data/clean_data_total.csv"
-    df_main = load_data(path)
-    handle_negative_values(df_main, ["vente","stock","Total","feature"])
-    quick_explore(df_main)
+    # Étape 1 : Chargement des données
+    df = load_data("data/clean_data_total.csv")
 
+    # Étape 2 : Nettoyage des valeurs négatives
+    cols = ["vente", "stock", "Total", "feature"]
+    df = handle_negative_values(df, cols)
 
+    # Étape 3 : Filtrage des produits valides
+    df = filter_products_advanced(df)
 
-    df = filter_products_advanced(df_main,
-    max_nan_ratio=0.1,
-    min_months=20,
-    min_total_mean=50,
-    max_gap_allowed=2)
-    quick_explore(df)
+    # Étape 4 : Imputation (benchmark sur un produit de référence)
+    ref_product = "PF009"  # peut être changé
+    print(f"\n Benchmark des méthodes d'imputation sur le produit '{ref_product}'")
+    imputation_results = evaluate_imputation_methods_for_product(df, ref_product, cols)
+    best_methods = {col: imputation_results[col]['best'] for col in imputation_results}
+    df_imputed = apply_global_imputations(df, best_methods, cols)
+
+    # Étape 5 : Détection des meilleures méthodes d’outliers
+    print("\n Détection des méthodes d'outliers pour chaque produit/colonne...")
+    results_summary = find_best_methods_for_df(df_imputed, columns_of_interest=cols)
+
+    # Étape 6 : Application des nettoyages d’outliers
+    print("\n Application du nettoyage des outliers...")
+    df_cleaned = apply_best_methods(df_imputed, results_summary, columns=cols)
     
 
+    # Étape 7 : Export des données nettoyées
+    os.makedirs("outputs", exist_ok=True)
+    output_path = "outputs/df_cleaned.csv"
+    df_cleaned.to_csv(output_path, index=False)
+    print(f"\n✅ Données finales sauvegardées dans : {output_path}")
 
-
-    
-
-
-
-
-    
- 
-
-
-
-   
-    #df.to_csv("data/df_cleaned.csv", index=False)
-    print("✅ Données chargées et sauvegardées temporairement dans df_cleaned.csv")
 
 if __name__ == "__main__":
     main()
