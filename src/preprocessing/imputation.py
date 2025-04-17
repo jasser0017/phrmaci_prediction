@@ -88,5 +88,11 @@ def apply_global_imputations(df, best_methods, columns):
             df[col] = df[col].ffill()
         elif method == 'lin':
             df[col] = df[col].interpolate(method='linear')
+    
+    
+    if "Unnamed: 0" in df.columns:
+        df = df.drop(columns=["Unnamed: 0"])
+
+    df=df.sort_values(by=['Date','Code prdt']).reset_index(drop=True)
 
     return df

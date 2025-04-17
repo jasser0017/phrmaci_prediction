@@ -91,5 +91,6 @@ def filter_products_advanced(df, max_nan_ratio=0.1, min_months=20, min_total_mea
 
     if verbose:
         print(f"\n✅ Produits conservés : {len(produits_valides)} / {df['Code prdt'].nunique()}")
+    df_filtré=df_filtré.sort_values(by=['Date','Code prdt']).reset_index(drop=True)
 
     return df_filtré
