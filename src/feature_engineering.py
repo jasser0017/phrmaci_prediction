@@ -5,6 +5,7 @@ import pandas as pd
 from statsmodels.tsa.seasonal import STL
 
 def generate_lags(df, group_col="Code prdt"):
+    df["Date"] = pd.to_datetime(df["Date"])
     lagged = df.copy()
     lagged['vente_lag1'] = lagged.groupby(group_col)['vente'].shift(1)
     lagged['vente_lag2'] = lagged.groupby(group_col)['vente'].shift(2)

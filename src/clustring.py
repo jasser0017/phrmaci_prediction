@@ -1,6 +1,7 @@
 import numpy as np
 from tslearn.clustering import KShape
 from tslearn.utils import to_time_series_dataset
+import pandas as pd
 
 
 def run_kshape_clustering(df, value_col="Total", group_col="Code prdt", date_col="Date", n_clusters=3, random_state=0):
@@ -15,6 +16,7 @@ def run_kshape_clustering(df, value_col="Total", group_col="Code prdt", date_col
     :param random_state: Graine aléatoire pour reproductibilité
     :return: df avec colonne 'cluster_label' ajoutée
     """
+    df[date_col] = pd.to_datetime(df[date_col])
     series_list = []
     product_indices = []
 
