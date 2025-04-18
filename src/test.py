@@ -6,6 +6,7 @@ import joblib
 
 from preprocessing.imputation import apply_best_imputations_by_group, find_best_imputation_methods
 from clustring import run_kshape_clustering
+from forecasting import forecast_and_evaluate
 from training import tune_sarimax_parameters,train_all_models
 from evaluation import evaluate_model
 
@@ -31,14 +32,8 @@ X_train, y_train, X_test, y_test=split_train_test(df_remaining,keep_cols=['Date'
 adf_test(y_train)
 tune_sarimax_parameters(y_train,y_test)
 df55=train_all_models(X_train,y_train,X_test,y_test)
-best_model = joblib.load("models/best_model.joblib")
-X_cols = [col for col in top_corr]
-X = df_eval[X_cols]
-y_pred = best_model.predict(X)
-
-df_eval["Prediction"] = y_pred
-print(evaluate_model(df_eval['Total'],df_eval['Prediction'],model_name=best_model))
-
+df_eval, resultat =forecast_and_evaluate(df_eval,top_corr)
+print(resultat)
 
 
 
