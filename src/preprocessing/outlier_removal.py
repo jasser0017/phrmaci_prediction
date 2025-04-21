@@ -1,11 +1,11 @@
-# src/preprocessing/outlier_removal.py
+
 
 import pandas as pd
 
 
 
 def apply_best_methods(df, results_summary, columns, group_col='Code prdt'):
-    from outlier_detection import outliers_iqr, outliers_winsorize, outliers_3sigma
+    from src.preprocessing.outlier_detection import outliers_iqr, outliers_winsorize, outliers_3sigma
     cleaned_dfs = []
 
     for prdt, group in df.groupby(group_col):
