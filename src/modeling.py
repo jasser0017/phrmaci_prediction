@@ -4,9 +4,10 @@ import numpy as np
 
 
 
-def select_predictive_features(df, target_col='Total', excluded_cols=None):
-    if excluded_cols is None:
-        excluded_cols = {'Date', target_col}
+def select_predictive_features(df, target_col='Total', excluded_cols={
+    'Date','Total','cg','ipp','pfc','cde','hedelix','respi','gastro','otc','mb','vip','P_valeur',
+}):
+
 
     candidate_cols = [c for c in df.columns if c not in excluded_cols]
     corrs = []

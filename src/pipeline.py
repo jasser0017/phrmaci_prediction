@@ -54,10 +54,13 @@ cols_derived = [
 ]
 best_methods_derived = find_best_imputation_methods(df_final, "PF009", cols_derived)
 df_final = apply_best_imputations_by_group(df_final, best_methods_derived)
+df_final.to_csv("outputs/df_featured.csv", index=False)
 
 # 5. Sélection des meilleures features
 print("\n📊 Sélection des variables prédictives...")
 top_corr = select_predictive_features(df_final, target_col="Total")
+pd.DataFrame({"feature": top_corr}).to_csv("outputs/top_features.csv", index=False)
+
 df_eval,df_remaining=extract_december_2024_evaluation_set(df_final)
 
 # 6. Split Train/Test
@@ -71,12 +74,11 @@ adf_test(y_train, title="y_train")
 print("\n🏋️ Entraînement des modèles...")
 best_model, best_score, all_results = train_all_models(X_train, y_train, X_test, y_test)
 
-# 9. Forecasting sur Décembre 2024
+
 print("\n📈 Forecasting sur décembre 2024...")
 
 df_forecast, forecast_metrics = forecast_and_evaluate(df_eval, top_corr)
 
-# 10. Export des résultats
 output_path = "outputs/df_forecast_december2024.csv"
 df_forecast.to_csv(output_path, index=False)
 print(f"\n✅ Prédictions sauvegardées dans : {output_path}")
